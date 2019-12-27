@@ -8,6 +8,8 @@ import (
 	"encoding/hex" //hex, hexadecimal encoding icin kullanılan bir poket
 	"fmt"
 	"io"
+	"io/ioutil"
+	"os"
 )
 
 //stringi nasıl encode'luyormusuz bakalım:
@@ -78,10 +80,26 @@ func decrypt(data []byte, password string) []byte {
 	return plaintext
 }
 
+//dosya olusturma adımları:
+
+func encryptFile(filename string, data []byte, password string) { //dosyayı sifrelemek icin,dosyaadı,datalar,parolaya ihtiyacımız var.
+	file, _ := os.Create(filename) //bir dosya olusturduk.
+	defer file.Close()             //use defer to close or deallocate resources.
+	file.Write(encrypt(data, password))
+}
+
+func decryptFile(filename string, password string) []byte {
+	data, _ := ioutil.ReadFile(filename) //dosyayı okuyoruz ve bunu data'ya atıyoruz.
+	return decrypt(data, password)       // decrypt fonksiyonuna bu okudugumuz datayı ve sifreyi yolluyoruz.
+
+}
+
 func main() {
 	ciphertext := encrypt([]byte("mervvee"), "password") // encrypt fonksiyonunu cagırarak, sifreyi olusturuyoruz.
 	fmt.Printf("Encrypted: %x\n", ciphertext)            //  (%x :base 16, with lower-case letters for a-f)
 	plaintext := decrypt(ciphertext, "password")         //decrypt edilmis hali, plaintext.
 	fmt.Printf("Decrypted: %s\n", plaintext)
+	encryptFile("deneme.txt", []byte("mervvee"), "password5")
+	fmt.Println(string(decryptFile("deneme.txt", "password5")))
 
 }
